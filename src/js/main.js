@@ -84,8 +84,6 @@ var dataset = [];
 
 //ToDo set scale for x and y
 
-//Todo figure out yScale -> think it has to do with ordinal scale
-
 var gdpDataset = [];
 
 
@@ -98,7 +96,7 @@ d3.json(urlLink, function(error, json) {
 
         //Width and height
         var w = 500;
-        var h = 100;
+        var h = 300;
         var barPadding = 1;
 
 
@@ -111,7 +109,7 @@ d3.json(urlLink, function(error, json) {
             .domain([0, d3.max(gdpDataset, function(d) {
                 return d;
             })])
-            .range([h, 0]);
+            .range([0, h]); //Not sure why this isn't [h, 0]
 
         /*var xScale = d3.scale.linear()
             .domain([h, d3.max(dateDataset, function(d) {
@@ -139,7 +137,7 @@ d3.json(urlLink, function(error, json) {
                 return yScale(dataset[i].GDP);
             })
             .attr("fill", function(d) {
-                return "rgb(0, 0, " + (d * 10) + ")";
+                return "rgb(0, 0, " + 255 + ")";
             });
     }
 );
