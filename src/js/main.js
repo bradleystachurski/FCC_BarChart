@@ -73,22 +73,50 @@ function type(d) {
     return d;
 }*/
 
+//Width and height
+var margin = {top: 40, right: 20, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
 var urlLink = "https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json";
 
 var dataset = [];
+
+//ToDo set scale for x and y
+
+//Todo figure out yScale -> think it has to do with ordinal scale
+
+var gdpDataset = [];
+
 
 d3.json(urlLink, function(error, json) {
         for(var i = 0; i < json.data.length; i++) {
             var tempDate = json.data[i][0];
             var tempGDP = json.data[i][1];
-            dataset.push(tempDate,tempGDP);
+            dataset.push({"date": tempDate, "GDP": tempGDP});
         }
-        console.log(dataset.length);
 
         //Width and height
         var w = 500;
         var h = 100;
         var barPadding = 1;
+
+
+        for(var i = 0; i < dataset.length; i++) {
+            gdpDataset.push(dataset[i].GDP);
+        }
+
+        //Create scales
+        var yScale = d3.scale.linear()
+            .domain([0, d3.max(gdpDataset, function(d) {
+                return d;
+            })])
+            .range([h, 0]);
+
+        /*var xScale = d3.scale.linear()
+            .domain([h, d3.max(dateDataset, function(d) {
+                return d;
+            })])*/
 
         //Create SVG element
         var svg = d3.select("body")
@@ -103,12 +131,12 @@ d3.json(urlLink, function(error, json) {
             .attr("x", function(d, i) {
                 return i * (w / dataset.length);
             })
-            .attr("y", function(d) {
-                return h - (d * 4);
+            .attr("y", function(d, i) {
+                return h - yScale(dataset[i].GDP);
             })
-            .attr("width", w / dataset.length - barPadding)
-            .attr("height", function(d) {
-                return d[0] * 4;
+            .attr("width", w / dataset.length)
+            .attr("height", function(d, i) {
+                return yScale(dataset[i].GDP);
             })
             .attr("fill", function(d) {
                 return "rgb(0, 0, " + (d * 10) + ")";
