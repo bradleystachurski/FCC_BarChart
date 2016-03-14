@@ -3,14 +3,9 @@ var margin = {top: 40, right: 20, bottom: 30, left: 40},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
-var w = 500;
-var h = 300;
-
 var urlLink = "https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json";
 
 var dataset = [];
-
-//ToDo set scale for x and y
 
 //Parse date & time
 var parseTime = d3.time.format("%Y-%m-%d").parse;
@@ -22,7 +17,7 @@ var xScale = d3.time.scale()
     .range([0, width]);
 
 var yScale = d3.scale.linear()
-    .range([height, 0]); //Not sure why this isn't [h, 0]. Was expecting it to be.
+    .range([height, 0]);
 
 //Just the tip...
 var tip = d3.tip()
@@ -52,9 +47,6 @@ var svg = d3.select("body")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top +")");
 
-var gdpDataset = [];
-
-
 svg.call(tip);
 
 d3.json(urlLink, function(error, json) {
@@ -64,12 +56,9 @@ d3.json(urlLink, function(error, json) {
             dataset.push({"date": tempDate, "GDP": tempGDP});
         }
 
-        for(var i = 0; i < dataset.length; i++) {
-            gdpDataset.push(dataset[i].GDP);
-        }
-
         //Add domain to scales
         xScale.domain([new Date(dataset[0].date), d3.time.year.offset(new Date(dataset[json.data.length - 1].date), 1)]);
+        console.log(new Date(dataset[json.data.length - 1].date));
         yScale.domain([0, d3.max(dataset, function(d) {
             return d.GDP;
         })]);
@@ -124,7 +113,7 @@ d3.json(urlLink, function(error, json) {
             .style("font-family", "arial")
             .style("text-decoration", "none")
             .text("US Gross Domestic Product");
-
+        
         svg.append("text")
             .attr("x", (width / 2))
             .attr("y", (height + (margin.bottom / 2) + 7))
@@ -134,24 +123,5 @@ d3.json(urlLink, function(error, json) {
             .style("font-family", "arial")
             .style("text-decoration", "none")
             .text(json.description.substring(80, json.description.length));
-
-        /*svg.selectAll("rect")
-            .data(dataset)
-            .enter()
-            .append("rect")
-            .attr("x", function(d, i) {
-                return i * (width / dataset.length);
-            })
-            .attr("y", function(d, i) {
-                return height - yScale(dataset[i].GDP);
-            })
-            .attr("width", width / dataset.length)
-            .attr("height", function(d, i) {
-                return yScale(dataset[i].GDP);
-            })
-            .attr("fill", function(d) {
-                return "rgb(0, 0, " + 255 + ")";
-            });*/
-
     }
 );
