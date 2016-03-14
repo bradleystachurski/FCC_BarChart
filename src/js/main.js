@@ -24,7 +24,13 @@ var xScale = d3.time.scale()
 var yScale = d3.scale.linear()
     .range([height, 0]); //Not sure why this isn't [h, 0]. Was expecting it to be.
 
-//Todo: Create y-axis
+//Just the tip...
+var tip = d3.tip()
+    .attr("class", "d3-tip")
+    .offset([-10, 0])
+    .html(function (d) {
+        return "<span style='color: black'>" + dateFormat(d.date) + "<br>$" + Math.round(d.GDP).toLocaleString() + " Billion</span>"
+    });
 
 //Create axes
 var xAxis = d3.svg.axis()
@@ -49,7 +55,7 @@ var svg = d3.select("body")
 var gdpDataset = [];
 
 
-
+svg.call(tip);
 
 d3.json(urlLink, function(error, json) {
         for(var i = 0; i < json.data.length; i++) {
@@ -57,8 +63,6 @@ d3.json(urlLink, function(error, json) {
             var tempGDP = json.data[i][1];
             dataset.push({"date": tempDate, "GDP": tempGDP});
         }
-
-        console.log(dataset);
 
         for(var i = 0; i < dataset.length; i++) {
             gdpDataset.push(dataset[i].GDP);
@@ -107,7 +111,29 @@ d3.json(urlLink, function(error, json) {
             })
             .attr("height", function(d) {
                 return height - yScale(d.GDP);
-            });
+            })
+            .on("mouseover", tip.show)
+            .on("mouseout", tip.hide);
+
+        //Create Title
+        svg.append("text")
+            .attr("x", (width / 2))
+            .attr("y", (margin.top)/8)
+            .attr("text-anchor", "middle")
+            .style("font-size", "30px")
+            .style("font-family", "arial")
+            .style("text-decoration", "none")
+            .text("US Gross Domestic Product");
+
+        svg.append("text")
+            .attr("x", (width / 2))
+            .attr("y", (height + (margin.bottom / 2) + 7))
+            .attr("text-anchor", "middle")
+            .attr("width", width)
+            .style("font-size", "12px")
+            .style("font-family", "arial")
+            .style("text-decoration", "none")
+            .text(json.description.substring(80, json.description.length));
 
         /*svg.selectAll("rect")
             .data(dataset)
